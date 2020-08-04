@@ -220,5 +220,179 @@ describe('types in TypeScript', () => {
 
     });
 
+    describe('object literals', () => {
+        it('have an implicit type', () => {
+            const book = {
+                title: 'Reality',
+                author: 'Kingsley',
+                publisher: 'Random House',
+                year: 2008
+            };
+
+            //book.publischer = 'OO'; // notice the typo, typescript protects from such things
+        });
+
+        it('explicit object literals with an interface', () => {
+            interface Book {
+                title: string;
+                author: string;
+                publisher: string;
+                year: number;
+                subtitle?: string;
+            };
+
+            const book1: Book = {
+                title: 'Reality',
+                author: 'Kingsley',
+                publisher: 'Random House',
+                year: 2008,
+                subtitle: 'cool stuff'
+            };
+
+            const book2: Book = {
+                title: 'Reality',
+                author: 'Kingsley',
+                publisher: 'Random House',
+                year: 2008
+            };
+
+        });
+
+        it('expando objects', () => {
+            interface Book {
+                title: string;
+                author: string;
+                publisher: string;
+                year: number;
+                subtitle?: string;
+                [key: string]: any;
+            };
+
+            const book1: Book = {
+                title: 'Reality',
+                author: 'Kingsley',
+                publisher: 'Random House',
+                year: 2008,
+                subtitle: 'cool stuff',
+                reviews: ['Interesting', 'A++'],
+                genre: 'Philsophy'
+            };
+
+            interface Vehicle {
+                vin: string;
+                make: string;
+                model: string;
+            }
+
+            interface Vehicles {
+                [vin: string]: Vehicle;
+            }
+
+            const vehicles: Vehicles = {
+                '928398298': { vin: '928398298', make: 'Honda', model: 'Pilot' },
+                'J3779739': { vin: 'J3779739', make: 'Chevy', model: 'Bolt' }
+            }
+
+            expect(vehicles['J3779739'].model).toBe('Bolt');
+
+            interface Dictionary<T> {
+                [key: string]: T
+            }
+
+            const library: Dictionary<Book> = {
+                'Reality': book1,
+                'High Weirdness': { title: 'High Weirdness', author: 'Davis', publisher: 'MIT', year: 2018 }
+            }
+
+            expect(library['High Weirdness'].author).toBe('Davis');
+
+        });
+
+        it('structural typing - duck typing', () => {
+            let x;
+
+            x = [];
+            x = {};
+
+            interface ThingwithBody { body?: string }
+            function logMessage(message: ThingwithBody) {
+
+                if (message.body) {
+                    console.log(`At ${new Date().toISOString()} you got the following message: ${message.body}`);
+                } else {
+                    console.log(`At ${new Date().toISOString()} you got the following message: NO BODY PROVIDED`);
+                }
+            }
+
+            logMessage({ body: 'TACOS!!' });
+
+            const phoneCall = {
+                from: 'Mom',
+                body: 'Call me, you slacker!'
+            }
+
+            logMessage(phoneCall);
+
+            // const call2 = {
+            //     from: 'Joe'
+            // }
+            // logMessage(call2)
+
+            function logMessage2(body?: string) {
+                if (body) {
+                    console.log(`At ${new Date().toISOString()} you got the following message: ${body}`);
+                } else {
+                    console.log(`At ${new Date().toISOString()} you got the following message: NO BODY PROVIDED`);
+                }
+            }
+
+            logMessage2('Hello. Can you bring me a pizza?');
+            logMessage2();
+        });
+
+    });
+
+    describe('function literals', () => {
+        it('three different ways to declare them', () => {
+
+            //Anonymous Functions
+            const substract = (a: number, b: number): number => a - b;
+
+            const multiply = function (a: number, b: number): number {
+                return a * b;
+            }
+
+            expect(add(10, 2)).toBe(12);
+            expect(multiply(3, 3)).toBe(9);
+
+            // Named function
+            function add(a: number, b: number): number {
+                return a + b;
+            }
+        });
+
+        it('a couple quick details about the syntax for arrow functions', () => {
+
+            type MathOp = (a: number, b: number) => number;
+
+            const add: MathOp = (a, b) => a + b;
+
+            const division: MathOp = (a, b) => {
+                if (b === 0) {
+                    throw new Error('Are you tyring to open a black hole or something!!');
+                } else {
+                    return a / b;
+                }
+            }
+
+            type Identity = (a: number) => number;
+
+
+            const mockingBird: Identity = a => a;
+
+        });
+
+    });
+
 
 });
